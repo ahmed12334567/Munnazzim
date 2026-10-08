@@ -1,5 +1,8 @@
+export type UserRole = 'admin' | 'user' | 'viewer';
+
 export interface User {
-    username?: string | undefined;
+    username?: string;
     email: string;
-    password: string
+    password: string;
+    role: UserRole;
 }

@@ -2,10 +2,10 @@ import pool from "../db/pool.js";
 import { User } from "../types/user.types.js";
 const user = {
     createUser: async(data: User) => {
-        const query = `INSERT INTO users(username, email, password)
-        VALUES($1, $2, $3)
+        const query = `INSERT INTO users(username, email, password, role)
+        VALUES($1, $2, $3, $4)
         RETURNING *`
-        const values = [data.username, data.email, data.password]
+        const values = [data.username, data.email, data.password, data.role]
         const result = await pool.query(query, values)
         return result.rows[0]
     },

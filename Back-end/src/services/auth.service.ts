@@ -1,10 +1,10 @@
 import userRepo from "../repositories/user.repository.js"
 import bcrypt from "bcrypt"
 import type { User } from '../types/user.types.js'
-import { generateToken, generateRefreshToken } from "../utils/jwt.js"
+import { generateToken } from "../utils/jwt.js"
 
 export const createUser = async (data: User) => {
-    const { username, email, password } = data;
+    const { username, email, password, role } = data;
     const existUser = await userRepo.findUserByEmail(email);
     if (existUser) {
         return {
@@ -19,7 +19,8 @@ export const createUser = async (data: User) => {
     const user = await userRepo.createUser({
         username,
         email,
-        password: hashedPassword
+        password: hashedPassword,
+        role
     });
 
     const accessToken = generateToken({
@@ -34,7 +35,8 @@ export const createUser = async (data: User) => {
         data: {
             id: user.id,
             username: user.username,
-            email: user.email
+            email: user.email,
+            role
         },
         accessToken
     }
@@ -75,7 +77,8 @@ export const loginUser = async (data: User) => {
         data: {
             id: findUser.id,
             username: findUser.username,
-            email: findUser.email
+            email: findUser.email,
+            role: findUser.role
         },
         accessToken
     }

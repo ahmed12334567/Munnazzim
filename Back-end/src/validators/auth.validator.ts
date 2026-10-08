@@ -11,6 +11,12 @@ export const registerValidator = [
     .notEmpty()
     .isEmail()
     .withMessage("invalid email"),
+  body("role")
+  .optional()
+    .trim()
+    .notEmpty()
+    .isIn(['admin', 'user', 'viewer'])
+    .withMessage("invalid role must be (admin, user, viewer)"),
   body("password")
     .trim()
     .notEmpty()
