@@ -1,9 +1,13 @@
 import { useState } from "react";
-import { checkAccount } from "./authStorage";
+import { useNavigate } from "react-router-dom";
+import { checkAccount, setCurrentAccount } from "./authStorage";
 import "./style.css";
 import { Link } from "react-router-dom";
+import Nav from "./Nav";
 
 export default function Login() {
+    const navigate = useNavigate();
+    const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
@@ -17,12 +21,13 @@ export default function Login() {
         setBusy(true);
 
         try {
-            const valid = await checkAccount({ email, password });
-            setMessage(
-                valid
-                    ? "Login successful."
-                    : "Email or password is incorrect. If you’re new, create an account first."
-            );
+            const account = await checkAccount({ name, email, password });
+            if (account) {
+                setCurrentAccount(account.email);
+                navigate(account.role === "admin" ? "/admin/add-tasks" : "/user/tasks");
+            } else {
+                setMessage("User name, email, or password is incorrect. If you’re new, create an account first.");
+            }
         } catch {
             setMessage("Unable to log in. Please try again.");
         } finally {
@@ -32,6 +37,7 @@ export default function Login() {
 
     return (
         <main className="login-page">
+            <Nav />
             <section className="login-card" aria-label="Log in">
                 <aside className="login-visual">
                     <a className="login-brand" href="/" aria-label="Monazem home">
@@ -64,6 +70,20 @@ export default function Login() {
                     </div>
 
                     <form className="login-form" onSubmit={handleSubmit}>
+                        <div className="form-field">
+                            <label htmlFor="login-name">User Name</label>
+                            <input
+                                id="login-name"
+                                name="name"
+                                type="text"
+                                autoComplete="username"
+                                placeholder="Your user name"
+                                value={name}
+                                onChange={(event) => setName(event.target.value)}
+                                required
+                            />
+                        </div>
+
                         <div className="form-field">
                             <label htmlFor="login-email">Email</label>
                             <input

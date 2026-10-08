@@ -2,6 +2,7 @@ import { useState } from "react";
 import { createAccount } from "./authStorage";
 import "./style.css";
 import { Link } from "react-router-dom";
+import Nav from "./Nav";
 
 export default function SignUp() {
     const [formData, setFormData] = useState({
@@ -9,6 +10,7 @@ export default function SignUp() {
         email: "",
         password: "",
         confirmPassword: "",
+        role: "user",
     });
     const [message, setMessage] = useState("");
     const [created, setCreated] = useState(false);
@@ -45,6 +47,7 @@ export default function SignUp() {
 
     return (
         <main className="login-page">
+            <Nav />
             <section className="login-card" aria-label="Create account">
                 <aside className="login-visual">
                     <a className="login-brand" href="/" aria-label="Monazem home">
@@ -78,15 +81,15 @@ export default function SignUp() {
 
                     <form className="login-form" onSubmit={handleSubmit}>
                         <div className="form-field">
-                            <label htmlFor="signup-name">Full name</label>
+                            <label htmlFor="signup-name">User Name</label>
                             <input
                                 id="signup-name"
                                 name="name"
                                 type="text"
-                                autoComplete="name"
+                                autoComplete="username"
                                 minLength={2}
                                 maxLength={80}
-                                placeholder="Your name"
+                                placeholder="Your user name"
                                 value={formData.name}
                                 onChange={updateField}
                                 required
@@ -106,6 +109,20 @@ export default function SignUp() {
                                 onChange={updateField}
                                 required
                             />
+                        </div>
+
+                        <div className="form-field">
+                            <label htmlFor="signup-role">Account type</label>
+                            <select
+                                id="signup-role"
+                                name="role"
+                                value={formData.role}
+                                onChange={updateField}
+                                required
+                            >
+                                <option value="user">User</option>
+                                <option value="admin">Admin</option>
+                            </select>
                         </div>
 
                         <div className="form-field">
