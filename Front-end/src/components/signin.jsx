@@ -1,10 +1,13 @@
 import { useState } from "react";
-import { createAccount } from "./authStorage";
+import { useNavigate } from "react-router-dom";
+import { registerAccount } from "../api";
+import { setCurrentAccount } from "./authStorage";
 import "./style.css";
 import { Link } from "react-router-dom";
 import Nav from "./Nav";
 
 export default function SignUp() {
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         name: "",
         email: "",
@@ -13,7 +16,6 @@ export default function SignUp() {
         role: "user",
     });
     const [message, setMessage] = useState("");
-    const [created, setCreated] = useState(false);
     const [busy, setBusy] = useState(false);
 
     function updateField(event) {
@@ -35,9 +37,9 @@ export default function SignUp() {
         setBusy(true);
 
         try {
-            await createAccount(formData);
-            setCreated(true);
-            setMessage("Account created. You can now log in.");
+            const { account, accessToken } = await registerAccount(formData);
+            setCurrentAccount(account, accessToken);
+            navigate(account.role === "admin" ? "/admin/team" : "/user/tasks");
         } catch (error) {
             setMessage(error.message || "Unable to create your account.");
         } finally {
@@ -87,8 +89,8 @@ export default function SignUp() {
                                 name="name"
                                 type="text"
                                 autoComplete="username"
-                                minLength={2}
-                                maxLength={80}
+                                minLength={3}
+                                maxLength={100}
                                 placeholder="Your user name"
                                 value={formData.name}
                                 onChange={updateField}
@@ -157,13 +159,13 @@ export default function SignUp() {
                             />
                         </div>
 
-                        <button className="login-submit" type="submit" disabled={busy || created}>
+                        <button className="login-submit" type="submit" disabled={busy}>
                             <span>{busy ? "Creating account…" : "Create account"}</span>
                             <span aria-hidden="true">→</span>
                         </button>
 
                         {message && (
-                            <p className="form-message" role="status">{message}</p>
+                            <p className="form-message" role="alert">{message}</p>
                         )}
                     </form>
 

@@ -1,4 +1,5 @@
 import { useNavigate, NavLink, Link } from "react-router-dom";
+import { logoutAccount } from "../../api";
 import { clearCurrentAccount, getCurrentAccount } from "../authStorage";
 
 export default function UserSidebar() {
@@ -6,9 +7,16 @@ export default function UserSidebar() {
     const account = getCurrentAccount();
     const initials = account?.name?.trim().charAt(0).toUpperCase() || "U";
 
-    function handleLogout() {
-        clearCurrentAccount();
-        navigate("/login");
+    async function handleLogout() {
+        let authMessage;
+        try {
+            await logoutAccount();
+        } catch (error) {
+            authMessage = `Your local session was ended, but server logout failed: ${error.message}`;
+        } finally {
+            clearCurrentAccount();
+        }
+        navigate("/login", authMessage ? { state: { authMessage } } : undefined);
     }
 
     return (

@@ -1,4 +1,5 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
+import { logoutAccount } from "../../api";
 import { clearCurrentAccount, getCurrentAccount } from "../authStorage";
 
 export default function AdminSidebar() {
@@ -6,9 +7,16 @@ export default function AdminSidebar() {
     const account = getCurrentAccount();
     const initials = account?.name?.trim().charAt(0).toUpperCase() || "A";
 
-    function handleLogout() {
-        clearCurrentAccount();
-        navigate("/login");
+    async function handleLogout() {
+        let authMessage;
+        try {
+            await logoutAccount();
+        } catch (error) {
+            authMessage = `Your local session was ended, but server logout failed: ${error.message}`;
+        } finally {
+            clearCurrentAccount();
+        }
+        navigate("/login", authMessage ? { state: { authMessage } } : undefined);
     }
 
     return (
@@ -32,7 +40,7 @@ export default function AdminSidebar() {
                     to="/admin/team"
                 >
                     <span className="sidebar-link-icon" aria-hidden="true">♧</span>
-                    Team
+                    Projects &amp; team
                 </NavLink>
                 <NavLink
                     className={({ isActive }) => `sidebar-link${isActive ? " is-active" : ""}`}

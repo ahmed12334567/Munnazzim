@@ -1,18 +1,18 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { checkAccount, setCurrentAccount } from "./authStorage";
+import { useLocation, useNavigate } from "react-router-dom";
+import { loginAccount } from "../api";
+import { setCurrentAccount } from "./authStorage";
 import "./style.css";
 import { Link } from "react-router-dom";
 import Nav from "./Nav";
 
 export default function Login() {
     const navigate = useNavigate();
-    const [name, setName] = useState("");
+    const location = useLocation();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
-    const [rememberMe, setRememberMe] = useState(false);
-    const [message, setMessage] = useState("");
+    const [message, setMessage] = useState(location.state?.authMessage || "");
     const [busy, setBusy] = useState(false);
 
     async function handleSubmit(event) {
@@ -21,15 +21,11 @@ export default function Login() {
         setBusy(true);
 
         try {
-            const account = await checkAccount({ name, email, password });
-            if (account) {
-                setCurrentAccount(account.email);
-                navigate(account.role === "admin" ? "/admin/add-tasks" : "/user/tasks");
-            } else {
-                setMessage("User name, email, or password is incorrect. If you’re new, create an account first.");
-            }
-        } catch {
-            setMessage("Unable to log in. Please try again.");
+            const { account, accessToken } = await loginAccount({ email, password });
+            setCurrentAccount(account, accessToken);
+            navigate(account.role === "admin" ? "/admin/team" : "/user/tasks");
+        } catch (error) {
+            setMessage(error.message || "Unable to log in. Please try again.");
         } finally {
             setBusy(false);
         }
@@ -71,20 +67,6 @@ export default function Login() {
 
                     <form className="login-form" onSubmit={handleSubmit}>
                         <div className="form-field">
-                            <label htmlFor="login-name">User Name</label>
-                            <input
-                                id="login-name"
-                                name="name"
-                                type="text"
-                                autoComplete="username"
-                                placeholder="Your user name"
-                                value={name}
-                                onChange={(event) => setName(event.target.value)}
-                                required
-                            />
-                        </div>
-
-                        <div className="form-field">
                             <label htmlFor="login-email">Email</label>
                             <input
                                 id="login-email"
@@ -121,15 +103,6 @@ export default function Login() {
                                 </button>
                             </div>
                         </div>
-
-                        <label className="remember-option">
-                            <input
-                                type="checkbox"
-                                checked={rememberMe}
-                                onChange={(event) => setRememberMe(event.target.checked)}
-                            />
-                            <span>Remember me</span>
-                        </label>
 
                         <button className="login-submit" type="submit" disabled={busy}>
                             <span>{busy ? "Logging in…" : "Login"}</span>
