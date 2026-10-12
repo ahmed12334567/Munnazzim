@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import { ApiResponse } from '../types/respons.types.js';
+import { ApiResponse } from '../interfaces/respons.interface.js';
 import { createUser, loginUser } from '../services/auth.service.js';
 import userRepo from "../repositories/user.repository.js";
 import jwt from "jsonwebtoken";
@@ -12,12 +12,10 @@ export const register = async (req: Request, res: Response<ApiResponse>) => {
     const result = await createUser(req.body);
 
     if (result.status === "fail") {
-        if (result.code === "EMAIL_ALREADY_EXISTS") {
-            return res.status(409).json({
-                status: "fail",
-                message: "Invalid email or password"
-            });
-        }
+        return res.status(result.code!).json({
+            status: "fail",
+            message: result.message
+        });
     }
     const refreshToken = generateRefreshToken({
         id: result.data!.id
@@ -38,16 +36,10 @@ export const login = async (req: Request, res: Response<ApiResponse>) => {
     const result = await loginUser(req.body)
 
     if (result.status === "fail" || result.code) {
-        if (result.code === "EMAIL_NOT_FOUND") {
-            return res.status(404).json({
+        if (result.code) {
+            return res.status(result.code).json({
                 status: "fail",
-                message: "email is not found"
-            })
-        }
-        else if (result.code === "WORNG_PASSWORD") {
-            return res.status(409).json({
-                status: "fail",
-                message: "worng password"
+                message: result.message
             })
         }
     }
@@ -135,7 +127,7 @@ export const logout = async (req: Request, res: Response<ApiResponse>) => {
                 message: "refresh token is required"
             })
         }
-        
+
         res.clearCookie("refreshToken", {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",

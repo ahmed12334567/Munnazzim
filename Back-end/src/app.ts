@@ -11,7 +11,10 @@ app.use(express.json());
 app.use(cookieParser());
 
 import authRouter from "./routes/auth.routes.js";
-app.use("/api/v1/auth", authRouter)
+app.use("/api/v1/auth", authRouter);
+
+import projectRouter from "./routes/project.route.js";
+app.use("/api/v1/project", projectRouter);
 
 app.use((req: Request, res: Response): void => {
   res.status(404).json({

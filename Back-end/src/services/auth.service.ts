@@ -1,6 +1,6 @@
 import userRepo from "../repositories/user.repository.js"
 import bcrypt from "bcrypt"
-import type { User } from '../types/user.types.js'
+import type { User } from '../interfaces/user.interface.js'
 import { generateToken } from "../utils/jwt.js"
 
 export const createUser = async (data: User) => {
@@ -10,7 +10,7 @@ export const createUser = async (data: User) => {
         return {
             status: "fail",
             message: "Email already exists",
-            code: "EMAIL_ALREADY_EXISTS"
+            code: 409
         }
     }
 
@@ -51,17 +51,17 @@ export const loginUser = async (data: User) => {
         return {
             status: "fail",
             message: "Email not found",
-            code: "EMAIL_NOT_FOUND"
+            code: 404
         }
     }
-    
+
     const comparePasswords = await bcrypt.compare(password, findUser.password);
 
     if (!comparePasswords) {
         return {
             status: "fail",
             message: "worng password",
-            code: "WORNG_PASSWORD"
+            code: 401
         }
     }
 

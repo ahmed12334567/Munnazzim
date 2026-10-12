@@ -1,5 +1,5 @@
 import pool from "../db/pool.js";
-import { User } from "../types/user.types.js";
+import { User } from "../interfaces/user.interface.js";
 const user = {
     createUser: async (data: User) => {
         const query = `INSERT INTO users(username, email, password, role)
