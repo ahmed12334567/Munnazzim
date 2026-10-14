@@ -50,3 +50,9 @@ export const createProject = async (data: Project, owner_id: string) => {
         client.release(destroyClient);
     }
 }
+
+export const getUserProjects = async (userId: string, limit: number,
+    offset: number): Promise<Project[]> => {
+
+    return projectRepo.selectUserProjects(userId, limit, offset)
+}
