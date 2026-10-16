@@ -35,6 +35,13 @@ const project = {
         const values = [userId, limit, offset]
         const result = await pool.query(query, values)
         return result.rows
+    },
+    isProjectMember: async (projectId: string, userId: string) => {
+        const query = `SELECT 1 FROM project_members 
+        WHERE project_id = $1 AND user_id = $2`
+        const values = [projectId, userId]
+        const result = await pool.query(query, values)
+        return result.rows[0]
     }
 }
 

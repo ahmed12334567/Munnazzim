@@ -16,6 +16,9 @@ app.use("/api/v1/auth", authRouter);
 import projectRouter from "./routes/project.route.js";
 app.use("/api/v1/project", projectRouter);
 
+import invitationtRouter from "./routes/invitation.route.js";
+app.use("/api/v1/invitation", invitationtRouter);
+
 app.use((req: Request, res: Response): void => {
   res.status(404).json({
     status: "fail",

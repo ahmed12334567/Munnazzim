@@ -19,8 +19,7 @@ export const registerValidator = [
   body("role")
     .optional()
     .trim()
-    .isIn(['admin', 'user', 'viewer'])
-    .withMessage("invalid role must be (admin, user, viewer)"),
+    .isIn(['admin', 'user', 'viewer']).withMessage("invalid role must be (admin, user, viewer)").bail(),
   body("password")
     .notEmpty().withMessage("password is required").bail()
     .trim()
